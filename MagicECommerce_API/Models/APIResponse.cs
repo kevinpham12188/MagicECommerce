@@ -2,7 +2,7 @@
 
 namespace MagicECommerce_API.Models
 {
-    public class APIResponse
+    public class APIResponse<T>
     {
         public HttpStatusCode StatusCode { get; set; }
         public bool IsSuccess { get; set; }
