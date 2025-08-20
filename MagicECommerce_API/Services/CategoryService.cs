@@ -1,4 +1,5 @@
-﻿using MagicECommerce_API.DTOS;
+﻿using MagicECommerce_API.DTOS.Request;
+using MagicECommerce_API.DTOS.Response;
 using MagicECommerce_API.Models;
 using MagicECommerce_API.Repositories.Interfaces;
 using MagicECommerce_API.Services.Interfaces;

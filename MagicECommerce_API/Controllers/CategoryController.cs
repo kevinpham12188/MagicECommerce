@@ -1,7 +1,10 @@
 ﻿using MagicECommerce_API.DTOS;
+using MagicECommerce_API.DTOS.Request;
+using MagicECommerce_API.DTOS.Response;
 using MagicECommerce_API.Models;
 using MagicECommerce_API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace MagicECommerce_API.Controllers
@@ -135,9 +138,48 @@ namespace MagicECommerce_API.Controllers
                     Result = createdCategory
                 });
             }
-            catch 
+            catch (DbUpdateException ex)
             {
-
+                if (ex.InnerException != null)
+                {
+                    var innerMessage = ex.InnerException.Message.ToLower();
+                    if (innerMessage.Contains("unique") ||
+                        innerMessage.Contains("duplicate") ||
+                        innerMessage.Contains("constraint") ||
+                        innerMessage.Contains(categoryRequest.Name.ToLower()))
+                    {
+                        return Conflict(new APIResponse<string>
+                        {
+                            StatusCode = HttpStatusCode.Conflict,
+                            IsSuccess = false,
+                            ErrorMessages = new List<string> { $"Category '{categoryRequest.Name}' already exist." }
+                        });
+                    }
+                }
+                return StatusCode(500, new APIResponse<string>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    ErrorMessages = new List<string> { "A database error occurred while creating the category" }
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new APIResponse<string>
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    IsSuccess = false,
+                    ErrorMessages = new List<string> { ex.Message }
+                });
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    ErrorMessages = new List<string> { "An error occurred while creating the category"}
+                });
             }
         }
     }

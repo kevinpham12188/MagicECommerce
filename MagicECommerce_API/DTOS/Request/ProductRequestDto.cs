@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MagicECommerce_API.DTOS
+namespace MagicECommerce_API.DTOS.Request
 {
     public class ProductRequestDto
     {

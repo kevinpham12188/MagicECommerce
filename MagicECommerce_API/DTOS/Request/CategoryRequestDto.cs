@@ -1,4 +1,4 @@
-﻿namespace MagicECommerce_API.DTOS
+﻿namespace MagicECommerce_API.DTOS.Request
 {
     public class CategoryRequestDto
     {

@@ -1,4 +1,5 @@
-﻿using MagicECommerce_API.DTOS;
+﻿using MagicECommerce_API.DTOS.Request;
+using MagicECommerce_API.DTOS.Response;
 
 namespace MagicECommerce_API.Services.Interfaces
 {
