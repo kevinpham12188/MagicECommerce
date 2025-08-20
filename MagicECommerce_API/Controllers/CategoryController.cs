@@ -64,22 +64,79 @@ namespace MagicECommerce_API.Controllers
                     ErrorMessages = new List<string> { "Invalid category data" }
                 });
             }
-            var updatedCategory = await _categoryService.UpdateCategoryAsync(id, categoryRequest);
-            if (updatedCategory == null)
+            if(id == Guid.Empty)
             {
-                return NotFound(new APIResponse<string>
+                return BadRequest(new APIResponse<string>
                 {
-                    StatusCode = HttpStatusCode.NotFound,
+                    StatusCode = HttpStatusCode.BadRequest,
                     IsSuccess = false,
-                    ErrorMessages = new List<string> { "Category not found" }
+                    ErrorMessages = new List<string> { "Invalid category ID" }
                 });
             }
-            return Ok(new APIResponse<CategoryResponseDto>
+            try
             {
-                StatusCode = HttpStatusCode.OK,
-                IsSuccess = true,
-                Result = updatedCategory
-            });
+                var updatedCategory = await _categoryService.UpdateCategoryAsync(id, categoryRequest);
+                if (updatedCategory == null)
+                {
+                    return NotFound(new APIResponse<string>
+                    {
+                        StatusCode = HttpStatusCode.NotFound,
+                        IsSuccess = false,
+                        ErrorMessages = new List<string> { "Category not found" }
+                    });
+                }
+                return Ok(new APIResponse<CategoryResponseDto>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Result = updatedCategory
+                });
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException != null)
+                {
+                    var innerMessage = ex.InnerException.Message.ToLower();
+                    if (innerMessage.Contains("unique") ||
+                        innerMessage.Contains("duplicate") ||
+                        innerMessage.Contains("constraint") ||
+                        innerMessage.Contains(categoryRequest.Name.ToLower()))
+                    {
+                        return Conflict(new APIResponse<string>
+                        {
+                            StatusCode = HttpStatusCode.Conflict,
+                            IsSuccess = false,
+                            ErrorMessages = new List<string> { $"Category name '{categoryRequest.Name}' already exists." }
+                        });
+                    }
+                }
+
+                // Handle other DbUpdateException cases
+                return StatusCode(500, new APIResponse<string>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    ErrorMessages = new List<string> { "A database error occurred while updating the category" }
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new APIResponse<string>
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    IsSuccess = false,
+                    ErrorMessages = new List<string> { ex.Message }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APIResponse<string>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    ErrorMessages = new List<string> { "An error occurred while updating the category" }
+                });
+            }
         }
 
         [HttpDelete("{id}")]
