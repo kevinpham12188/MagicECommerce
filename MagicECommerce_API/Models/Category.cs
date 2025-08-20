@@ -1,8 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MagicECommerce_API.Models
 {
+    [Index(nameof(Name), IsUnique = true)]
     public class Category
     {
         [Key]

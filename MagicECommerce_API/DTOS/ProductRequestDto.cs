@@ -2,7 +2,7 @@
 
 namespace MagicECommerce_API.DTOS
 {
-    public class ProductCreateDto
+    public class ProductRequestDto
     {
         [Required]
         [StringLength(150)]
