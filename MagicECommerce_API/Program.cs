@@ -1,4 +1,5 @@
 using MagicECommerce_API.Data;
+using MagicECommerce_API.Extensions;
 using MagicECommerce_API.Repositories;
 using MagicECommerce_API.Repositories.Interfaces;
 using MagicECommerce_API.Services;
@@ -23,6 +24,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseGlobalExceptionHandling();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
