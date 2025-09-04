@@ -35,15 +35,6 @@ namespace MagicECommerce_API.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var product = await _productService.GetByIdAsync(id);
-            if (product == null)
-            {
-                return NotFound(new APIResponse<string>
-                {
-                    StatusCode = HttpStatusCode.NotFound,
-                    IsSuccess = false,
-                    ErrorMessages = new List<string> { "Product not found" }
-                });
-            }
             return Ok(new APIResponse<ProductResponseDto>
             {
                 StatusCode = HttpStatusCode.OK,
@@ -55,15 +46,6 @@ namespace MagicECommerce_API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ProductRequestDto productRequest)
         {
-            if (productRequest == null)
-            {
-                return BadRequest(new APIResponse<string>
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    IsSuccess = false,
-                    ErrorMessages = new List<string> { "Invalid product data" }
-                });
-            }
             var createdProduct = await _productService.CreateAsync(productRequest);
             return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id }, new APIResponse<ProductResponseDto>
             {
@@ -76,25 +58,7 @@ namespace MagicECommerce_API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] ProductRequestDto productRequest)
         {
-            if (productRequest == null)
-            {
-                return BadRequest(new APIResponse<string>
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    IsSuccess = false,
-                    ErrorMessages = new List<string> { "Invalid product data" }
-                });
-            }
             var updatedProduct = await _productService.UpdateAsync(id, productRequest);
-            if (updatedProduct == null)
-            {
-                return NotFound(new APIResponse<string>
-                {
-                    StatusCode = HttpStatusCode.NotFound,
-                    IsSuccess = false,
-                    ErrorMessages = new List<string> { "Product not found" }
-                });
-            }
             return Ok(new APIResponse<ProductResponseDto>
             {
                 StatusCode = HttpStatusCode.OK,
@@ -106,16 +70,7 @@ namespace MagicECommerce_API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var isDeleted = await _productService.DeleteAsync(id);
-            if (!isDeleted)
-            {
-                return NotFound(new APIResponse<string>
-                {
-                    StatusCode = HttpStatusCode.NotFound,
-                    IsSuccess = false,
-                    ErrorMessages = new List<string> { "Product not found" }
-                });
-            }
+            await _productService.DeleteAsync(id);
             return Ok(new APIResponse<string>
             {
                 StatusCode = HttpStatusCode.OK,

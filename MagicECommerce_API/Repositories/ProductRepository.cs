@@ -29,6 +29,7 @@ namespace MagicECommerce_API.Repositories
 
         public async Task<Product> CreateAsync(Product product)
         {
+            product.CreateAt = DateTime.Now;
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
             return product;
