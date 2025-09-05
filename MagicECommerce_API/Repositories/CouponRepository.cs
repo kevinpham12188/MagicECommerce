@@ -1,4 +1,5 @@
 ﻿using MagicECommerce_API.Data;
+using MagicECommerce_API.DTOS.Request;
 using MagicECommerce_API.Models;
 using MagicECommerce_API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -13,39 +14,46 @@ namespace MagicECommerce_API.Repositories
             _context = context;
         }
 
-        public Task<Coupon> CreateCouponAsync(Coupon coupon)
+        public async Task<Coupon> CreateCouponAsync(Coupon coupon)
         {
-            throw new NotImplementedException();
+            coupon.CreatedAt = DateTime.Now;
+            coupon.UpdatedAt = DateTime.Now;
+            _context.Coupons.AddAsync(coupon);
+            await _context.SaveChangesAsync();
+            return coupon;
         }
 
-        public Task<bool> DeleteCouponAsync(Guid id)
+        public async Task<bool> DeleteCouponAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var coupon = await _context.Coupons.FindAsync(id);
+            if (coupon == null)
+                return false;
+            _context.Coupons.Remove(coupon);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public async Task<IEnumerable<Coupon>> GetAllCouponAsync()
+        public async Task<IEnumerable<Coupon>> GetAllCouponsAsync()
         {
             return await _context.Coupons.ToListAsync();
         }
 
-        public Task<IEnumerable<Coupon>> GetAllCouponsAsync()
+        public async Task<Coupon?> GetCouponByCodeAsync(string code)
         {
-            throw new NotImplementedException();
+            return await _context.Coupons.FirstOrDefaultAsync(c => c.Code.ToLower() == code.ToLower() && c.isActive);
         }
 
-        public Task<Coupon?> GetCouponByCodeAsync(string code)
+        public async Task<Coupon?> GetCouponByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return await _context.Coupons.FindAsync(id);
         }
 
-        public Task<Coupon?> GetCouponByIdAsync(Guid id)
+        public async Task<Coupon?> UpdateCouponAsync(Guid id, Coupon coupon)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<Coupon?> UpdateCouponAsync(Guid id, Coupon coupon)
-        {
-            throw new NotImplementedException();
+            coupon.UpdatedAt = DateTime.Now;
+            _context.Coupons.Update(coupon);
+            await _context.SaveChangesAsync();
+            return coupon;
         }
     }
 }
