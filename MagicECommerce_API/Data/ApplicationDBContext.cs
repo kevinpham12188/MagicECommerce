@@ -8,6 +8,6 @@ namespace MagicECommerce_API.Data
         public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options) : base(options) { }
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<Coupon> Coupon { get; set; }
+        public DbSet<Coupon> Coupons { get; set; }
     }
 }
