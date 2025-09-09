@@ -1,6 +1,6 @@
 ﻿using MagicECommerce_API.Exceptions.Base;
 
-namespace MagicECommerce_API.Exceptions.ProductException
+namespace MagicECommerce_API.Exceptions.CouponException
 {
     public class DuplicateCouponException : BaseCustomException
     {

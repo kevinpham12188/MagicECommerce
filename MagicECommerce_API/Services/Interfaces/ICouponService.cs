@@ -6,7 +6,7 @@ namespace MagicECommerce_API.Services.Interfaces
 {
     public interface ICouponService
     {
-        Task<IEnumerable<CouponResponseDto>> GetAllCouponAsync();
+        Task<IEnumerable<CouponResponseDto>> GetAllCouponsAsync();
         Task<CouponResponseDto?> GetCouponByIdAsync(Guid id);
         Task<CouponResponseDto?> GetCouponByCodeAsync(string code);
         Task<CouponResponseDto> CreateCouponAsync(CouponRequestDto dto);

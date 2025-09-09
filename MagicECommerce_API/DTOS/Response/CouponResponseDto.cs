@@ -11,9 +11,9 @@ namespace MagicECommerce_API.DTOS.Response
         public DateTime ValidTo { get; set; }
         public int UsageLimit { get; set; }
         public int UsageCount { get; set; }
-        public bool isActive { get; set; }
-        public DateTime createdAt { get; set; }
-        public DateTime updatedAt { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
         
     }
 }

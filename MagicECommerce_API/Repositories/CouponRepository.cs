@@ -28,7 +28,8 @@ namespace MagicECommerce_API.Repositories
             var coupon = await _context.Coupons.FindAsync(id);
             if (coupon == null)
                 return false;
-            _context.Coupons.Remove(coupon);
+            coupon.IsActive = false;
+            coupon.UpdatedAt = DateTime.Now;
             await _context.SaveChangesAsync();
             return true;
         }
@@ -40,7 +41,7 @@ namespace MagicECommerce_API.Repositories
 
         public async Task<Coupon?> GetCouponByCodeAsync(string code)
         {
-            return await _context.Coupons.FirstOrDefaultAsync(c => c.Code.ToLower() == code.ToLower() && c.isActive);
+            return await _context.Coupons.FirstOrDefaultAsync(c => c.Code.ToLower() == code.ToLower() && c.IsActive);
         }
 
         public async Task<Coupon?> GetCouponByIdAsync(Guid id)

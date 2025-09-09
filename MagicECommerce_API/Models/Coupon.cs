@@ -32,7 +32,7 @@ namespace MagicECommerce_API.Models
 
         public int UsageCount { get; set; } = 0;
 
-        public bool isActive { get; set; } = true;
+        public bool IsActive { get; set; } = true;
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;

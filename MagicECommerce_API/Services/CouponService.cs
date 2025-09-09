@@ -1,7 +1,13 @@
 ﻿using MagicECommerce_API.DTOS.Request;
 using MagicECommerce_API.DTOS.Response;
+using MagicECommerce_API.Exceptions.Base;
+using MagicECommerce_API.Exceptions.CategoryException;
+using MagicECommerce_API.Exceptions.CouponException;
+using MagicECommerce_API.Exceptions.ProductException;
+using MagicECommerce_API.Models;
 using MagicECommerce_API.Repositories.Interfaces;
 using MagicECommerce_API.Services.Interfaces;
+using System.Runtime.InteropServices;
 
 namespace MagicECommerce_API.Services
 {
@@ -9,50 +15,359 @@ namespace MagicECommerce_API.Services
     {
         private readonly ICouponRepository _repo;
         private readonly ILogger<CouponService> _logger;
+
         public CouponService(ICouponRepository repo, ILogger<CouponService> logger)
         {
             _repo = repo;
             _logger = logger;
         }
 
-        public Task<CouponResponseDto> CreateCouponAsync(CouponRequestDto dto)
+        public async Task<CouponResponseDto> CreateCouponAsync(CouponRequestDto dto)
         {
-            throw new NotImplementedException();
+            // Validation
+            if(dto == null)
+            {
+                throw new ValidationException("Invalid coupon data");
+            }
+            if(string.IsNullOrWhiteSpace(dto.Code))
+            {
+                throw new ValidationException("Coupon code is required");
+            }
+            if(string.IsNullOrWhiteSpace(dto.DiscountType))
+            {
+                throw new ValidationException("Discount type is required");
+            }
+
+            //Validation discount type
+            var discountType = dto.DiscountType.ToUpper();
+            if(discountType != "PERCENTAGE" && discountType != "FIXED")
+            {
+                throw new ValidationException("Discount type must be PERCENTAGE or FIXED");
+            }
+
+            //Validate discount value
+            if(dto.DiscountValue <= 0)
+            {
+                throw new ValidationException("Discount value must be greater than 0");
+            }
+
+            //Validate percentage range
+            if(discountType == "PERCENTAGE" && dto.DiscountValue > 100)
+            {
+                throw new ValidationException("Percentage discount cannot exceed 100%");
+            }
+
+            //Validate dates
+            if(dto.ValidFrom >= dto.ValidTo)
+            {
+                throw new ValidationException("Valid from date must be before valid to date");
+            }
+
+            //Validate usage limit
+            if(dto.UsageLimit <= 0)
+            {
+                throw new ValidationException("Usage limit must be greater than 0");
+            }
+
+            //Check for duplicate code
+            var code = dto.Code.Trim().ToUpper();
+            var existingCode = await _repo.GetCouponByCodeAsync(code);
+            if(existingCode != null)
+            {
+                throw new DuplicateCouponException(code);
+            }
+
+            var coupon = new Coupon
+            {
+                Id = Guid.NewGuid(),
+                Code = code,
+                DiscountType = discountType,
+                DiscountValue = dto.DiscountValue,
+                ValidFrom = dto.ValidFrom,
+                ValidTo = dto.ValidTo,
+                UsageLimit = dto.UsageLimit,
+                UsageCount = 0
+            };
+            await _repo.CreateCouponAsync(coupon);
+            _logger.LogInformation("Coupon created successfully: {CouponCode}", coupon.Code);
+            return new CouponResponseDto
+            {
+                Id = coupon.Id,
+                Code = coupon.Code,
+                DiscountType = coupon.DiscountType,
+                DiscountValue = coupon.DiscountValue,
+                ValidFrom = coupon.ValidFrom,
+                ValidTo = coupon.ValidTo,
+                UsageLimit = coupon.UsageLimit,
+                UsageCount = coupon.UsageCount,
+                IsActive = coupon.IsActive,
+                CreatedAt = coupon.CreatedAt,
+                UpdatedAt = coupon.UpdatedAt
+            };
         }
 
-        public Task<bool> DeleteCouponAsync(Guid id)
+        public async Task<bool> DeleteCouponAsync(Guid id)
         {
-            throw new NotImplementedException();
+            //Validation
+            if(id == Guid.Empty)
+            {
+                throw new ValidationException("Invalid coupon ID");
+            }
+            //Check if exist before attempting to delete
+            var existingCoupon = await _repo.GetCouponByIdAsync(id);
+            if(existingCoupon == null)
+            {
+                throw new CouponNotFoundException(id);
+            }
+            var result = await _repo.DeleteCouponAsync(id);
+            if(result)
+            {
+                _logger.LogInformation("Coupon deleted successfully: {CouponId}", id);
+            }
+            return result;
         }
 
-        public Task<IEnumerable<CouponResponseDto>> GetAllCouponAsync()
+        public async Task<IEnumerable<CouponResponseDto>> GetAllCouponsAsync()
         {
-            throw new NotImplementedException();
+            var coupons = await _repo.GetAllCouponsAsync();
+            return coupons.Select(c => new CouponResponseDto
+            {
+                Id = c.Id,
+                Code = c.Code,
+                DiscountType = c.DiscountType,
+                DiscountValue = c.DiscountValue,
+                ValidFrom = c.ValidFrom,
+                ValidTo = c.ValidTo,
+                IsActive = c.IsActive,
+                UsageCount = c.UsageCount,
+                UsageLimit = c.UsageLimit,
+                CreatedAt = c.CreatedAt,
+                UpdatedAt = c.UpdatedAt
+            }).ToList();
         }
 
-        public Task<CouponResponseDto?> GetCouponByCodeAsync(string code)
+        public async Task<CouponResponseDto?> GetCouponByCodeAsync(string code)
         {
-            throw new NotImplementedException();
+            //Validation
+            if(string.IsNullOrWhiteSpace(code))
+            {
+                throw new ValidationException("Coupon code is required");
+            }
+            var coupon = await _repo.GetCouponByCodeAsync(code.Trim().ToUpper());
+            if(coupon == null)
+            {
+                throw new CouponNotFoundException(Guid.Empty);
+            }
+            return new CouponResponseDto
+            {
+                Id = coupon.Id,
+                Code = coupon.Code,
+                DiscountType = coupon.DiscountType,
+                DiscountValue = coupon.DiscountValue,
+                ValidFrom = coupon.ValidFrom,
+                ValidTo = coupon.ValidTo,
+                UsageLimit = coupon.UsageLimit,
+                UsageCount = coupon.UsageCount,
+                IsActive = coupon.IsActive,
+                CreatedAt = coupon.CreatedAt,
+                UpdatedAt = coupon.UpdatedAt
+            };
         }
 
-        public Task<CouponResponseDto?> GetCouponByIdAsync(Guid id)
+        public async Task<CouponResponseDto?> GetCouponByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            //Validation
+            if(id == Guid.Empty)
+            {
+                throw new ValidationException("Invalid coupon ID");
+            }
+            var coupon = await _repo.GetCouponByIdAsync(id);
+            if(coupon == null)
+            {
+                throw new CouponNotFoundException(id);
+            }
+            return new CouponResponseDto
+            {
+                Id = coupon.Id,
+                Code = coupon.Code,
+                DiscountType = coupon.DiscountType,
+                DiscountValue = coupon.DiscountValue,
+                ValidFrom = coupon.ValidFrom,
+                ValidTo = coupon.ValidTo,
+                UsageLimit = coupon.UsageLimit,
+                UsageCount = coupon.UsageCount,
+                IsActive = coupon.IsActive,
+                CreatedAt = coupon.CreatedAt,
+                UpdatedAt = coupon.UpdatedAt
+            };
         }
 
-        public Task<CouponResponseDto?> UpdateCouponAsync(Guid id, CouponRequestDto dto)
+        public async Task<CouponResponseDto?> UpdateCouponAsync(Guid id, CouponRequestDto dto)
         {
-            throw new NotImplementedException();
+            //Validation
+            if (dto == null)
+            {
+                throw new ValidationException("Invalid coupon data");
+            }
+            if (id == Guid.Empty)
+            {
+                throw new ValidationException("Invalid coupon ID");
+            }
+
+            // Validate if coupon exists
+            var coupon = await _repo.GetCouponByIdAsync(id);
+            if (coupon == null)
+            {
+                throw new CouponNotFoundException(id);
+            }
+
+            // Required fields
+            if (string.IsNullOrWhiteSpace(dto.Code))
+            {
+                throw new ValidationException("Coupon code is required");
+            }
+            if (string.IsNullOrWhiteSpace(dto.DiscountType))
+            {
+                throw new ValidationException("Discount type is required");
+            }
+
+            // Validate discount type
+            var discountType = dto.DiscountType.ToUpper();
+            if (discountType != "PERCENTAGE" && discountType != "FIXED")
+            {
+                throw new ValidationException("Invalid discount type. Must be either 'PERCENTAGE' or 'FIXED'");
+            }
+
+            // Validate discount value
+            if (dto.DiscountValue <= 0)
+            {
+                throw new ValidationException("Discount value must be greater than zero");
+            }
+
+            // Validate percentage discount value
+            if (discountType == "PERCENTAGE" && dto.DiscountValue > 100)
+            {
+                throw new ValidationException("Percentage discount value cannot exceed 100%");
+            }
+
+            // Validate date range
+            if (dto.ValidFrom >= dto.ValidTo)
+            {
+                throw new ValidationException("Invalid date range: 'Valid From' must be earlier than 'Valid To'");
+            }
+
+            // Validate usage limit
+            if (dto.UsageLimit <= 0)
+            {
+                throw new ValidationException("Usage limit must be greater than zero");
+            }
+            
+            // Uniqueness check
+            var code = dto.Code.Trim().ToUpper();
+            if(code != coupon.Code)
+            {
+                var existingCoupon = await _repo.GetCouponByCodeAsync(code);
+                if (existingCoupon != null)
+                {
+                    throw new DuplicateCouponException(code);
+                }
+            }
+            
+            coupon.Code = code;
+            coupon.DiscountType = discountType;
+            coupon.DiscountValue = dto.DiscountValue;
+            coupon.ValidFrom = dto.ValidFrom;
+            coupon.ValidTo = dto.ValidTo;
+            coupon.UsageLimit = dto.UsageLimit;
+
+            var updated = await _repo.UpdateCouponAsync(id, coupon);
+            _logger.LogInformation("Coupon updated successfully: {CouponId}", id);
+            
+            return new CouponResponseDto
+            {
+                Id = updated.Id,
+                Code = updated.Code,
+                DiscountType = updated.DiscountType,
+                DiscountValue = updated.DiscountValue,
+                ValidFrom = updated.ValidFrom,
+                ValidTo = updated.ValidTo,
+                UsageLimit = updated.UsageLimit,
+                UsageCount = updated.UsageCount,
+                IsActive = updated.IsActive,
+                CreatedAt = updated.CreatedAt,
+                UpdatedAt = updated.UpdatedAt
+            };
         }
 
-        public Task<CouponResponseDto?> UseCouponAsync(string code)
+        public async Task<CouponResponseDto?> UseCouponAsync(string code)
         {
-            throw new NotImplementedException();
+            if(string.IsNullOrWhiteSpace(code))
+            {
+                throw new ValidationException("Coupon code is required");
+            }
+            var coupon = await _repo.GetCouponByCodeAsync(code.Trim().ToUpper());
+            if(coupon == null)
+            {
+                throw new CouponNotFoundException(Guid.Empty);
+            }
+
+            var now = DateTime.Now;
+            // Check date validity
+            if (now < coupon.ValidFrom || now > coupon.ValidTo)
+            {
+                throw new ExpiredCouponException();
+            }
+
+            // Check usage limit
+            if(coupon.UsageCount >= coupon.UsageLimit)
+            {
+                throw new CouponUsageLimitException();
+            }
+
+            coupon.UsageCount += 1;
+            var updated = await _repo.UpdateCouponAsync(coupon.Id, coupon);
+            _logger.LogInformation("Coupon used successfully: {CouponCode}, Usage: {UsageCount}/{UsageLimit}", coupon.Code, coupon.UsageCount, coupon.UsageLimit);
+            return new CouponResponseDto
+            {
+                Id = updated.Id,
+                Code = updated.Code,
+                DiscountType = updated.DiscountType,
+                DiscountValue = updated.DiscountValue,
+                ValidFrom = updated.ValidFrom,
+                ValidTo = updated.ValidTo,
+                UsageLimit = updated.UsageLimit,
+                UsageCount = updated.UsageCount,
+                IsActive = updated.IsActive,
+                CreatedAt = updated.CreatedAt,
+                UpdatedAt = updated.UpdatedAt
+            };
         }
 
-        public Task<bool> ValidateCouponAsync(string code)
+        public async Task<bool> ValidateCouponAsync(string code)
         {
-            throw new NotImplementedException();
+            if(string.IsNullOrWhiteSpace(code))
+            {
+                return false;
+            }
+            var coupon = await _repo.GetCouponByCodeAsync(code.Trim().ToUpper());
+            if(coupon == null)
+            {
+                return false;
+            }
+            var now = DateTime.Now;
+
+            // Check date validity
+            if (now < coupon.ValidFrom || now > coupon.ValidTo)
+            {
+                return false;
+            }
+
+            // Check usage limit
+            if (coupon.UsageCount >= coupon.UsageLimit)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
