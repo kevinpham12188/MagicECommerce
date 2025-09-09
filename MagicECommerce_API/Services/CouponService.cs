@@ -354,7 +354,7 @@ namespace MagicECommerce_API.Services
             {
                 return false;
             }
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             // Check date validity
             if (now < coupon.ValidFrom || now > coupon.ValidTo)
