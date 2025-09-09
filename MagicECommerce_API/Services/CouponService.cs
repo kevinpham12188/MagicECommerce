@@ -22,6 +22,8 @@ namespace MagicECommerce_API.Services
             _logger = logger;
         }
 
+        #region Public Methods
+
         public async Task<CouponResponseDto> CreateCouponAsync(CouponRequestDto dto)
         {
             // Validation
@@ -90,20 +92,7 @@ namespace MagicECommerce_API.Services
             };
             await _repo.CreateCouponAsync(coupon);
             _logger.LogInformation("Coupon created successfully: {CouponCode}", coupon.Code);
-            return new CouponResponseDto
-            {
-                Id = coupon.Id,
-                Code = coupon.Code,
-                DiscountType = coupon.DiscountType,
-                DiscountValue = coupon.DiscountValue,
-                ValidFrom = coupon.ValidFrom,
-                ValidTo = coupon.ValidTo,
-                UsageLimit = coupon.UsageLimit,
-                UsageCount = coupon.UsageCount,
-                IsActive = coupon.IsActive,
-                CreatedAt = coupon.CreatedAt,
-                UpdatedAt = coupon.UpdatedAt
-            };
+            return MapToDto(coupon);
         }
 
         public async Task<bool> DeleteCouponAsync(Guid id)
@@ -130,20 +119,7 @@ namespace MagicECommerce_API.Services
         public async Task<IEnumerable<CouponResponseDto>> GetAllCouponsAsync()
         {
             var coupons = await _repo.GetAllCouponsAsync();
-            return coupons.Select(c => new CouponResponseDto
-            {
-                Id = c.Id,
-                Code = c.Code,
-                DiscountType = c.DiscountType,
-                DiscountValue = c.DiscountValue,
-                ValidFrom = c.ValidFrom,
-                ValidTo = c.ValidTo,
-                IsActive = c.IsActive,
-                UsageCount = c.UsageCount,
-                UsageLimit = c.UsageLimit,
-                CreatedAt = c.CreatedAt,
-                UpdatedAt = c.UpdatedAt
-            }).ToList();
+            return coupons.Select(MapToDto);
         }
 
         public async Task<CouponResponseDto?> GetCouponByCodeAsync(string code)
@@ -158,20 +134,7 @@ namespace MagicECommerce_API.Services
             {
                 throw new CouponNotFoundException(Guid.Empty);
             }
-            return new CouponResponseDto
-            {
-                Id = coupon.Id,
-                Code = coupon.Code,
-                DiscountType = coupon.DiscountType,
-                DiscountValue = coupon.DiscountValue,
-                ValidFrom = coupon.ValidFrom,
-                ValidTo = coupon.ValidTo,
-                UsageLimit = coupon.UsageLimit,
-                UsageCount = coupon.UsageCount,
-                IsActive = coupon.IsActive,
-                CreatedAt = coupon.CreatedAt,
-                UpdatedAt = coupon.UpdatedAt
-            };
+            return MapToDto(coupon);
         }
 
         public async Task<CouponResponseDto?> GetCouponByIdAsync(Guid id)
@@ -186,20 +149,7 @@ namespace MagicECommerce_API.Services
             {
                 throw new CouponNotFoundException(id);
             }
-            return new CouponResponseDto
-            {
-                Id = coupon.Id,
-                Code = coupon.Code,
-                DiscountType = coupon.DiscountType,
-                DiscountValue = coupon.DiscountValue,
-                ValidFrom = coupon.ValidFrom,
-                ValidTo = coupon.ValidTo,
-                UsageLimit = coupon.UsageLimit,
-                UsageCount = coupon.UsageCount,
-                IsActive = coupon.IsActive,
-                CreatedAt = coupon.CreatedAt,
-                UpdatedAt = coupon.UpdatedAt
-            };
+            return MapToDto(coupon);
         }
 
         public async Task<CouponResponseDto?> UpdateCouponAsync(Guid id, CouponRequestDto dto)
@@ -283,20 +233,7 @@ namespace MagicECommerce_API.Services
             var updated = await _repo.UpdateCouponAsync(id, coupon);
             _logger.LogInformation("Coupon updated successfully: {CouponId}", id);
             
-            return new CouponResponseDto
-            {
-                Id = updated.Id,
-                Code = updated.Code,
-                DiscountType = updated.DiscountType,
-                DiscountValue = updated.DiscountValue,
-                ValidFrom = updated.ValidFrom,
-                ValidTo = updated.ValidTo,
-                UsageLimit = updated.UsageLimit,
-                UsageCount = updated.UsageCount,
-                IsActive = updated.IsActive,
-                CreatedAt = updated.CreatedAt,
-                UpdatedAt = updated.UpdatedAt
-            };
+            return MapToDto(updated);
         }
 
         public async Task<CouponResponseDto?> UseCouponAsync(string code)
@@ -311,7 +248,7 @@ namespace MagicECommerce_API.Services
                 throw new CouponNotFoundException(Guid.Empty);
             }
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             // Check date validity
             if (now < coupon.ValidFrom || now > coupon.ValidTo)
             {
@@ -324,24 +261,12 @@ namespace MagicECommerce_API.Services
                 throw new CouponUsageLimitException();
             }
 
-            coupon.UsageCount += 1;
+            coupon.UsageCount++;
             var updated = await _repo.UpdateCouponAsync(coupon.Id, coupon);
             _logger.LogInformation("Coupon used successfully: {CouponCode}, Usage: {UsageCount}/{UsageLimit}", coupon.Code, coupon.UsageCount, coupon.UsageLimit);
-            return new CouponResponseDto
-            {
-                Id = updated.Id,
-                Code = updated.Code,
-                DiscountType = updated.DiscountType,
-                DiscountValue = updated.DiscountValue,
-                ValidFrom = updated.ValidFrom,
-                ValidTo = updated.ValidTo,
-                UsageLimit = updated.UsageLimit,
-                UsageCount = updated.UsageCount,
-                IsActive = updated.IsActive,
-                CreatedAt = updated.CreatedAt,
-                UpdatedAt = updated.UpdatedAt
-            };
-        }
+            return MapToDto(updated);
+            }
+        
 
         public async Task<bool> ValidateCouponAsync(string code)
         {
@@ -369,5 +294,26 @@ namespace MagicECommerce_API.Services
             }
             return true;
         }
+        #endregion
+
+        #region Private Methods
+        private static CouponResponseDto MapToDto(Coupon coupon)
+        {
+            return new CouponResponseDto
+            {
+                Id = coupon.Id,
+                Code = coupon.Code,
+                DiscountType = coupon.DiscountType,
+                DiscountValue = coupon.DiscountValue,
+                ValidFrom = coupon.ValidFrom,
+                ValidTo = coupon.ValidTo,
+                UsageLimit = coupon.UsageLimit,
+                UsageCount = coupon.UsageCount,
+                IsActive = coupon.IsActive,
+                CreatedAt = coupon.CreatedAt,
+                UpdatedAt = coupon.UpdatedAt
+            };
+        }
+        #endregion
     }
 }
