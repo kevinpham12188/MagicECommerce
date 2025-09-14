@@ -6,7 +6,7 @@ namespace MagicECommerce_API.Repositories.Interfaces
     {
         Task<IEnumerable<ProductImage>> GetAllProductImageAsync();
         Task<IEnumerable<ProductImage>> GetProductImagesByProductIdAsync(Guid productId);
-        Task<ProductImage?> GetProductImageByIdAsync(Guid id);
+        Task<ProductImage> GetProductImageByIdAsync(Guid id);
         Task<ProductImage> CreateProductImageAsync(ProductImage productImage);
         Task<ProductImage> UpdateProductImageAsync(ProductImage productImage);
         Task<bool> DeleteProductImageAsync(Guid id);
