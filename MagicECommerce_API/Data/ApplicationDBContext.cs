@@ -10,5 +10,16 @@ namespace MagicECommerce_API.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Coupon> Coupons { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ProductImage>()
+                .HasOne<Product>()
+                .WithMany()
+                .HasForeignKey(pi => pi.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        }
     }
 }
