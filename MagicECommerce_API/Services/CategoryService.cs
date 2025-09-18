@@ -18,15 +18,11 @@ namespace MagicECommerce_API.Services
             _logger = logger;
         }
 
+        #region Public Methods
         public async Task<IEnumerable<CategoryResponseDto>> GetAllCategoriesAsync()
         {
             var categories = await _repo.GetAllCategoriesAsync();
-            return categories.Select(c => new CategoryResponseDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Description = c.Description
-            });
+            return categories.Select(MapToResponseDto);
         }
 
         public async Task<CategoryResponseDto?> GetCategoryByIdAsync(Guid id)
@@ -38,12 +34,7 @@ namespace MagicECommerce_API.Services
             var category = await _repo.GetCategoryByIdAsync(id);
             if (category == null)
                 throw new CategoryNotFoundException(id);
-            return new CategoryResponseDto 
-            {
-                Id = category.Id,
-                Name = category.Name,
-                Description = category.Description
-            };
+            return MapToResponseDto(category);
         }
 
         public async Task<CategoryResponseDto> CreateCategoryAsync(CategoryRequestDto dto)
@@ -73,12 +64,7 @@ namespace MagicECommerce_API.Services
             };
             await _repo.CreateCategoryAsync(category);
             _logger.LogInformation("Category created successfully: {CategoryName}", category.Name);
-            return new CategoryResponseDto
-            {
-                Id = category.Id,
-                Name = category.Name,
-                Description = category.Description
-            };
+            return MapToResponseDto(category);
         }
 
         public async Task<bool> DeleteCategoryAsync(Guid id)
@@ -99,9 +85,7 @@ namespace MagicECommerce_API.Services
                 _logger.LogInformation("Category deleted successfully: {CategoryId}", id);
             }
             return result;
-        }
-
-        
+        }       
 
         public async Task<IEnumerable<CategoryResponseDto>> GetCategoriesByNameAsync(string name)
         {
@@ -110,16 +94,10 @@ namespace MagicECommerce_API.Services
                 throw new ValidationException("Search name is required");
             }
             var categories = await _repo.GetCategoriesByNameAsync(name.Trim());
-            return categories.Select(c => new CategoryResponseDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Description = c.Description
-            }).ToList();
+            return categories.Select(MapToResponseDto);
         }
 
         
-
         public async Task<CategoryResponseDto?> UpdateCategoryAsync(Guid id, CategoryRequestDto dto)
         {
             // Validation
@@ -150,12 +128,21 @@ namespace MagicECommerce_API.Services
             category.Description = dto.Description;
             var updated = await _repo.UpdateCategoryAsync(category);
             _logger.LogInformation("Category updated successfully: {CategoryId}", id);
+            return MapToResponseDto(updated);
+        }
+        #endregion
+
+        #region Private Methods
+        private static CategoryResponseDto MapToResponseDto(Category category)
+        {
             return new CategoryResponseDto
             {
-                Id = updated.Id,
-                Name = updated.Name,
-                Description = updated.Description
+                Id = category.Id,
+                Name = category.Name,
+                Description = category.Description
             };
         }
+        #endregion
+
     }
 }
