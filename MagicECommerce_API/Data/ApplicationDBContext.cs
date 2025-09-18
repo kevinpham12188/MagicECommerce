@@ -10,6 +10,7 @@ namespace MagicECommerce_API.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Coupon> Coupons { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
+        public DbSet<ProductVariant> ProductVariants { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,7 +30,24 @@ namespace MagicECommerce_API.Data
                 entity.Property(pi => pi.AltText)
                     .HasMaxLength(255);
             });
-                
+            modelBuilder.Entity<ProductVariant>(entity =>
+            {
+                entity.HasOne(pv => pv.Product)
+                    .WithMany(p => p.ProductVariants)
+                    .HasForeignKey(pv => pv.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                entity.Property(pv => pv.VariantName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+                entity.Property(pv => pv.VariantValue)
+                    .IsRequired()
+                    .HasMaxLength(50);
+                entity.Property(pv => pv.StockQuantity)
+                    .IsRequired();
+                entity.HasIndex(pv => new { pv.ProductId, pv.VariantName, pv.VariantValue })
+                    .IsUnique()
+                    .HasDatabaseName("IX_ProductVariants_Unique");
+            });
         }
     }
 }

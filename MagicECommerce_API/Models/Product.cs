@@ -32,5 +32,6 @@ namespace MagicECommerce_API.Models
 
         public Category? Category { get; set; }
         public ICollection<ProductImage> productImages { get; set; } = new List<ProductImage>();
+        public ICollection<ProductVariant> ProductVariants { get; set; } = new List<ProductVariant>();
     }
 }
