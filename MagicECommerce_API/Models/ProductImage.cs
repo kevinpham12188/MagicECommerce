@@ -22,5 +22,6 @@ namespace MagicECommerce_API.Models
         // Foreign key to Product
         [Required]
         public Guid ProductId { get; set; }
+        public Product Product { get; set; }
     }
 }

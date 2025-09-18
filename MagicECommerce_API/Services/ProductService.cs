@@ -22,6 +22,8 @@ namespace MagicECommerce_API.Services
             _categoryService = categoryService;
             _logger = logger;
         }
+
+        #region Public Methods
         public async Task<ProductResponseDto> CreateAsync(ProductRequestDto dto)
         {
             if(dto == null)
@@ -55,28 +57,13 @@ namespace MagicECommerce_API.Services
                 Description = dto.Description,
                 Price = dto.Price,
                 StockQuantity = dto.StockQuantity,
-                CategoryId = dto.CategoryId
+                CategoryId = dto.CategoryId,
+                IsActive = true
             };
             var created = await _repo.CreateAsync(product);
-            _logger.LogInformation("Product created successfully: {ProductName}", created.Name);
+            _logger.LogInformation("Product created successfully: {ProductName} with ID {ProductId}", created.Name, created.Id);
 
-            created.Category = new Category
-            {
-                Id = categoryDto.Id,
-                Name = categoryDto.Name,
-                Description = categoryDto.Description
-            };
-
-            return new ProductResponseDto
-            {
-                Id = created.Id,
-                Name = created.Name,
-                Description = created.Description,
-                Price = created.Price,
-                StockQuantity = created.StockQuantity,
-                CategoryId = created.CategoryId,
-                CategoryName = created.Category.Name
-            };
+            return MapToResponseDto(created);
         }
 
         public async Task<bool> DeleteAsync(Guid id)
@@ -101,16 +88,7 @@ namespace MagicECommerce_API.Services
         public async Task<IEnumerable<ProductResponseDto>> GetAllAsync()
         {
             var products = await _repo.GetAllAsync();
-            return products.Select(p => new ProductResponseDto
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Description = p.Description,
-                Price = p.Price,
-                StockQuantity = p.StockQuantity,
-                CategoryId = p.CategoryId,
-                CategoryName = p.Category != null ? p.Category.Name : null,
-            });
+            return products.Select(MapToResponseDto);
         }
 
         public async Task<ProductResponseDto?> GetByIdAsync(Guid id)
@@ -125,16 +103,7 @@ namespace MagicECommerce_API.Services
                 throw new ProductNotFoundException(id);
             }
             ;
-            return new ProductResponseDto
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                StockQuantity = product.StockQuantity,
-                CategoryId = product.CategoryId,
-                CategoryName = product.Category != null ? product.Category.Name : null,
-            };
+            return MapToResponseDto(product);
         }
 
         public async Task<ProductResponseDto?> UpdateAsync(Guid id, ProductRequestDto dto)
@@ -185,16 +154,35 @@ namespace MagicECommerce_API.Services
             product.Name = dto.Name;
             product.Description = dto.Description;
             var updated = await _repo.UpdateAsync(product);
+            return MapToResponseDto(product);
+        }
+        #endregion
+
+        #region Private Helpers
+        private static ProductResponseDto MapToResponseDto(Product product)
+        {
             return new ProductResponseDto
             {
-                Id = updated.Id,
-                Name = updated.Name,
-                Price = updated.Price,
-                Description = updated.Description,
-                StockQuantity = updated.StockQuantity,
-                CategoryId = updated.CategoryId,
-                CategoryName = updated.Category != null ? updated.Category.Name : null
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                StockQuantity = product.StockQuantity,
+                CategoryId = product.CategoryId,
+                IsActive = product.IsActive,
+                CreatedAt = product.CreateAt,
+                CategoryName = product.Category?.Name,
+
+                ProductImages = product.productImages?.Select(pi => new ProductImageResponseDto
+                {
+                    Id = pi.Id,
+                    Url = pi.Url,
+                    AltText = pi.AltText,
+                    CreatedAt = pi.CreatedAt,
+                    UpdatedAt = pi.UpdatedAt
+                }).ToList() ?? new List<ProductImageResponseDto>()
             };
         }
+        #endregion
     }
 }

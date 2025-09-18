@@ -15,11 +15,21 @@ namespace MagicECommerce_API.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<ProductImage>()
-                .HasOne<Product>()
-                .WithMany()
-                .HasForeignKey(pi => pi.ProductId)
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ProductImage>(entity =>
+            {
+                entity.HasOne(pi => pi.Product)
+                    .WithMany(p => p.productImages)
+                    .HasForeignKey(pi => pi.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(pi => pi.Url)
+                    .IsRequired()
+                    .HasMaxLength(500);
+
+                entity.Property(pi => pi.AltText)
+                    .HasMaxLength(255);
+            });
+                
         }
     }
 }

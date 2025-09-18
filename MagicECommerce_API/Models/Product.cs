@@ -31,5 +31,6 @@ namespace MagicECommerce_API.Models
         public DateTime CreateAt { get; set; } = DateTime.Now;
 
         public Category? Category { get; set; }
+        public ICollection<ProductImage> productImages { get; set; } = new List<ProductImage>();
     }
 }
