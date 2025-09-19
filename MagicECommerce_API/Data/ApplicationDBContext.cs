@@ -16,10 +16,15 @@ namespace MagicECommerce_API.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Product>(entity =>
+            {
+                entity.Property(p => p.Price).HasColumnType("decimal(18,2)");
+            });
+
             modelBuilder.Entity<ProductImage>(entity =>
             {
                 entity.HasOne(pi => pi.Product)
-                    .WithMany(p => p.productImages)
+                    .WithMany(p => p.ProductImages)
                     .HasForeignKey(pi => pi.ProductId)
                     .OnDelete(DeleteBehavior.Cascade);
 

@@ -17,7 +17,7 @@ namespace MagicECommerce_API.Repositories
         {
             return await _context.Products
                 .Include(p => p.Category)
-                .Include(p => p.productImages)
+                .Include(p => p.ProductImages)
                 .OrderBy(p => p.Name)
                 .ToListAsync();
         }
@@ -26,7 +26,7 @@ namespace MagicECommerce_API.Repositories
         {
             return await _context.Products
                 .Include(p => p.Category)
-                .Include(p => p.productImages)
+                .Include(p => p.ProductImages)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 

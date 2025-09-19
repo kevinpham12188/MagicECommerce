@@ -173,7 +173,7 @@ namespace MagicECommerce_API.Services
                 CreatedAt = product.CreateAt,
                 CategoryName = product.Category?.Name,
 
-                ProductImages = product.productImages?.Select(pi => new ProductImageResponseDto
+                ProductImages = product.ProductImages?.Select(pi => new ProductImageResponseDto
                 {
                     Id = pi.Id,
                     Url = pi.Url,
