@@ -180,7 +180,16 @@ namespace MagicECommerce_API.Services
                     AltText = pi.AltText,
                     CreatedAt = pi.CreatedAt,
                     UpdatedAt = pi.UpdatedAt
-                }).ToList() ?? new List<ProductImageResponseDto>()
+                }).ToList() ?? new List<ProductImageResponseDto>(),
+                ProductVariants = product.ProductVariants?.Select(pv => new ProductVariantResponseDto
+                {
+                    Id = pv.Id,
+                    VariantName = pv.VariantName,
+                    VariantValue = pv.VariantValue,
+                    StockQuantity = pv.StockQuantity,
+                    CreatedAt = pv.CreatedAt,
+                    UpdatedAt = pv.UpdatedAt
+                }).ToList() ?? new List<ProductVariantResponseDto>()
             };
         }
         #endregion

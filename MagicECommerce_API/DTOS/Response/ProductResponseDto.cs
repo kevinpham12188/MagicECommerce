@@ -12,5 +12,6 @@
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public List<ProductImageResponseDto> ProductImages { get; set; } = new List<ProductImageResponseDto>();
+        public List<ProductVariantResponseDto> ProductVariants { get; set; } = new List<ProductVariantResponseDto>();
     }
 }
