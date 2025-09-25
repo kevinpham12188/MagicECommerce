@@ -16,8 +16,8 @@ namespace MagicECommerce_API.Repositories
 
         public async Task<Coupon> CreateCouponAsync(Coupon coupon)
         {
-            coupon.CreatedAt = DateTime.Now;
-            coupon.UpdatedAt = DateTime.Now;
+            coupon.CreatedAt = DateTime.UtcNow;
+            coupon.UpdatedAt = DateTime.UtcNow;
             _context.Coupons.AddAsync(coupon);
             await _context.SaveChangesAsync();
             return coupon;
@@ -47,14 +47,6 @@ namespace MagicECommerce_API.Repositories
         public async Task<Coupon?> GetCouponByIdAsync(Guid id)
         {
             return await _context.Coupons.FindAsync(id);
-        }
-
-        public async Task<Coupon?> UpdateCouponAsync(Guid id, Coupon coupon)
-        {
-            coupon.UpdatedAt = DateTime.Now;
-            _context.Coupons.Update(coupon);
-            await _context.SaveChangesAsync();
-            return coupon;
-        }
+        }   
     }
 }
