@@ -11,6 +11,7 @@ namespace MagicECommerce_API.Data
         public DbSet<Coupon> Coupons { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<ProductVariant> ProductVariants { get; set; }
+        public DbSet<Role> Roles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -53,6 +54,8 @@ namespace MagicECommerce_API.Data
                     .IsUnique()
                     .HasDatabaseName("IX_ProductVariants_Unique");
             });
+
+            modelBuilder.Entity<Role>().HasIndex(r => r.Name).IsUnique();
         }
     }
 }
