@@ -47,6 +47,14 @@ namespace MagicECommerce_API.Repositories
         public async Task<Coupon?> GetCouponByIdAsync(Guid id)
         {
             return await _context.Coupons.FindAsync(id);
-        }   
+        }  
+        
+        public async Task<Coupon?> UpdateCouponAsync(Guid id, Coupon coupon)
+        {
+            coupon.UpdatedAt = DateTime.UtcNow;
+            _context.Coupons.Update(coupon);
+            await _context.SaveChangesAsync();
+            return coupon;
+        }
     }
 }
