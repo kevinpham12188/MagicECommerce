@@ -10,7 +10,7 @@ namespace MagicECommerce_API.Services.Interfaces
         Task<RoleResponseDto> GetRoleByNameAsync(string name);
         Task<IEnumerable<RoleResponseDto>> GetAllRolesAsync();
         Task<RoleResponseDto> UpdateRoleAsync(Guid id, RoleRequestDto dto);
-        Task<RoleResponseDto> DeleteRoleAsync(Guid id);
+        Task<bool> DeleteRoleAsync(Guid id);
 
     }
 }
