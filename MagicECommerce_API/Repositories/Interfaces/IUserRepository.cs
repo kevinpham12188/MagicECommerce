@@ -7,7 +7,7 @@ namespace MagicECommerce_API.Repositories.Interfaces
         Task<User> CreateAsync(User user);
         Task<User?> GetByIdAsync(Guid id);
         Task<User?> GetByEmailAsync(string email);
-        Task<User?> GetByRoleAsync(Guid roleId);
+        Task<User?> GetWithRoleAsync(Guid Id);
         Task<IEnumerable<User>> GetAllAsync();
         Task<IEnumerable<User>> GetAllWithRolesAsync();
         Task<IEnumerable<User>> GetUsersByRoleIdAsync(Guid roleId);

@@ -12,6 +12,7 @@ namespace MagicECommerce_API.Data
         public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<ProductVariant> ProductVariants { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
