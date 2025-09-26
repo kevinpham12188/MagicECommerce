@@ -260,6 +260,7 @@ namespace MagicECommerce_API.Services
                 Email = user.Email,
                 RoleId = user.RoleId,
                 RoleName = user.Role?.Name,
+                Phone = user.Phone,
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt
             };
