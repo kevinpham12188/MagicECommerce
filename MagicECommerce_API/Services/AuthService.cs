@@ -25,6 +25,7 @@ namespace MagicECommerce_API.Services
             _logger = logger;
         }
 
+        #region Public Methods
         public async Task<AuthResponseDto> LoginAsync(LoginRequestDto dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Password))
@@ -32,12 +33,17 @@ namespace MagicECommerce_API.Services
                 throw new ValidationException("Email and password are required");
             }
             var user = await _userRepo.GetByEmailAsync(dto.Email.Trim());
-            if (user == null || !VerifyPassword(dto.Password, user.Password))
+            if (user == null)
+            {
+                throw new UserNotFoundException(dto.Email);
+            }
+                
+            if(!VerifyPassword(dto.Password, user.Password))
             {
                 throw new ValidationException("Invalid email or password");
             }
             var userWithRole = await _userRepo.GetWithRoleAsync(user.Id);
-            var token = _tokenService.GenerateToken(userWithRole);
+            var token = _tokenService.GenerateToken(userWithRole!);
 
             _logger.LogInformation("User {Email} logged in successfully", dto.Email);
 
@@ -45,7 +51,7 @@ namespace MagicECommerce_API.Services
             {
                 Token = token,
                 Expiration = DateTime.UtcNow.AddMinutes(60),
-                User = MapToUserResponseDto(userWithRole)
+                User = MapToUserResponseDto(userWithRole!)
             };
         }
 
@@ -84,10 +90,16 @@ namespace MagicECommerce_API.Services
             return true;
         }
 
+        public async Task<UserResponseDto> RegisterAsync(UserCreateRequestDto dto)
+        {
+            return await _userService.CreateUserAsync(dto);
+        }
+
         public async Task<UserResponseDto> GetCurrentUserAsync(Guid userId)
         {
             return await _userService.GetUserByIdAsync(userId);
         }
+        #endregion
 
         #region Private Methods
         private static string HashPassword(string password)
