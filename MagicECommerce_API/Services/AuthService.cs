@@ -10,7 +10,7 @@ using System.Text;
 
 namespace MagicECommerce_API.Services
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly IUserRepository _userRepo;
         private readonly IUserService _userService;
