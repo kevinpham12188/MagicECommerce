@@ -13,6 +13,7 @@ namespace MagicECommerce_API.Data
         public DbSet<ProductVariant> ProductVariants { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Address> Addresses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -64,6 +65,23 @@ namespace MagicECommerce_API.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+
+            modelBuilder.Entity<Address>(entity =>
+            {
+                entity.HasKey(a => a.Id);
+
+                entity.Property(a => a.Label).IsRequired().HasMaxLength(50);
+                entity.Property(a => a.Line1).IsRequired().HasMaxLength(256);
+                entity.Property(a => a.Line2).HasMaxLength(256);
+                entity.Property(a => a.City).IsRequired().HasMaxLength(256);
+                entity.Property(a => a.State).IsRequired().HasMaxLength(256);
+                entity.Property(a => a.ZipCode).IsRequired().HasMaxLength(20);
+                entity.Property(a => a.Country).IsRequired().HasMaxLength(100);
+                entity.Property(a => a.IsDefault).HasDefaultValue(false);
+                entity.HasOne(a => a.User).WithMany().HasForeignKey(u => u.UserId).OnDelete(DeleteBehavior.Cascade);
+                entity.HasIndex(a => a.UserId);
+                entity.HasIndex(a => new { a.UserId, a.IsDefault });
+            });
         }
     }
 }
