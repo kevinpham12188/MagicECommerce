@@ -1,4 +1,5 @@
-﻿using MagicECommerce_API.DTOS;
+﻿using MagicECommerce_API.Attributes;
+using MagicECommerce_API.DTOS;
 using MagicECommerce_API.DTOS.Request;
 using MagicECommerce_API.DTOS.Response;
 using MagicECommerce_API.Models;
@@ -44,6 +45,7 @@ namespace MagicECommerce_API.Controllers
         }
 
         [HttpPut("{id}")]
+        [RequireRole("Admin", "Manager")]
         public async Task<IActionResult> Update(Guid id, [FromBody] CategoryRequestDto categoryRequest)
         {
             var updatedCategory = await _categoryService.UpdateCategoryAsync(id, categoryRequest);
@@ -56,6 +58,7 @@ namespace MagicECommerce_API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [RequireRole("Admin")]
         public async Task<IActionResult> Delete(Guid id)
         {
             await _categoryService.DeleteCategoryAsync(id);
@@ -80,6 +83,7 @@ namespace MagicECommerce_API.Controllers
         }
 
         [HttpPost]
+        [RequireRole("Admin", "Manager")]
         public async Task<IActionResult> Create([FromBody] CategoryRequestDto categoryRequest)
         {
                 var createdCategory = await _categoryService.CreateCategoryAsync(categoryRequest);

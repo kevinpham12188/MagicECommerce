@@ -1,4 +1,5 @@
-﻿using MagicECommerce_API.DTOS;
+﻿using MagicECommerce_API.Attributes;
+using MagicECommerce_API.DTOS;
 using MagicECommerce_API.DTOS.Request;
 using MagicECommerce_API.DTOS.Response;
 using MagicECommerce_API.Services.Interfaces;
@@ -18,6 +19,7 @@ namespace MagicECommerce_API.Controllers
             _roleService = roleService;
         }
         [HttpGet]
+        [RequireRole("Admin")]
         public async Task<IActionResult> GetAllRoles()
         {
             var roles = await _roleService.GetAllRolesAsync();
@@ -30,6 +32,7 @@ namespace MagicECommerce_API.Controllers
         }
 
         [HttpGet("{id}")]
+        [RequireRole("Admin")]
         public async Task<IActionResult> GetRoleById(Guid id)
         {
             var role = await _roleService.GetRoleByIdAsync(id);
@@ -42,6 +45,7 @@ namespace MagicECommerce_API.Controllers
         }
 
         [HttpGet("name/{name}")]
+        [RequireRole("Admin")]
         public async Task<IActionResult> GetRoleByName(string name)
         {
             var role = await _roleService.GetRoleByNameAsync(name);
@@ -54,6 +58,7 @@ namespace MagicECommerce_API.Controllers
         }
 
         [HttpPost]
+        [RequireRole("Admin")]
         public async Task<IActionResult> CreateRole([FromBody] RoleRequestDto dto)
         {
             var createdRole = await _roleService.CreateRoleAsync(dto);
@@ -66,6 +71,7 @@ namespace MagicECommerce_API.Controllers
         }
 
         [HttpPut("{id}")]
+        [RequireRole("Admin")]
         public async Task<IActionResult> UpdateRole(Guid id, [FromBody] RoleRequestDto dto)
         {
             var updatedRole = await _roleService.UpdateRoleAsync(id, dto);
@@ -78,6 +84,7 @@ namespace MagicECommerce_API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [RequireRole("Admin")]
         public async Task<IActionResult> DeleteRole(Guid id)
         {
             var deleted = await _roleService.DeleteRoleAsync(id);
