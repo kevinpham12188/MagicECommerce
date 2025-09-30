@@ -7,7 +7,7 @@ namespace MagicECommerce_API.Services.Interfaces
     {
         Task<AuthResponseDto> LoginAsync(LoginRequestDto dto);
         Task<UserResponseDto> RegisterAsync(UserCreateRequestDto dto);
-        Task<bool> ChangePasswordAsyunc(Guid userId, ChangePasswordRequestDto dto);
+        Task<bool> ChangePasswordAsync(Guid userId, ChangePasswordRequestDto dto);
         Task<UserResponseDto> GetCurrentUserAsync(Guid userId);
     }
 }
