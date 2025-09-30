@@ -1,8 +1,10 @@
-﻿using MagicECommerce_API.DTOS;
+﻿using MagicECommerce_API.Attributes;
+using MagicECommerce_API.DTOS;
 using MagicECommerce_API.DTOS.Request;
 using MagicECommerce_API.DTOS.Response;
 using MagicECommerce_API.Models;
 using MagicECommerce_API.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -10,7 +12,7 @@ namespace MagicECommerce_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ProductController : ControllerBase
+    public class ProductController : BaseController
     {
         private readonly IProductService _productService;
 
@@ -44,6 +46,7 @@ namespace MagicECommerce_API.Controllers
         }
 
         [HttpPost]
+        [RequireRole("Admin", "Manager")]
         public async Task<IActionResult> Create([FromBody] ProductRequestDto productRequest)
         {
             var createdProduct = await _productService.CreateAsync(productRequest);
@@ -56,6 +59,7 @@ namespace MagicECommerce_API.Controllers
         }
 
         [HttpPut("{id}")]
+        [RequireRole("Admin", "Manager")]
         public async Task<IActionResult> Update(Guid id, [FromBody] ProductRequestDto productRequest)
         {
             var updatedProduct = await _productService.UpdateAsync(id, productRequest);
@@ -68,6 +72,7 @@ namespace MagicECommerce_API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [RequireRole("Admin")]
         public async Task<IActionResult> Delete(Guid id)
         {
             await _productService.DeleteAsync(id);
@@ -79,5 +84,18 @@ namespace MagicECommerce_API.Controllers
             });
         }
 
+        [HttpGet("my-favorites")]
+        [Authorize]
+        public async Task<IActionResult> GetMyFavorite()
+        {
+            var userId = GetCurrentUserId();
+            //Implement get user's favorite products logic here
+            return Ok(new APIResponse<object>
+            {
+                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                Result = new { Message = $"Favorites for user {userId}" }
+            });
+        }
     }
 }

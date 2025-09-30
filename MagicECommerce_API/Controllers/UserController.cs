@@ -1,7 +1,9 @@
-﻿using MagicECommerce_API.DTOS;
+﻿using MagicECommerce_API.Attributes;
+using MagicECommerce_API.DTOS;
 using MagicECommerce_API.DTOS.Request;
 using MagicECommerce_API.DTOS.Response;
 using MagicECommerce_API.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -9,7 +11,7 @@ namespace MagicECommerce_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    public class UserController : BaseController
     {
         private readonly IUserService _userService;
         public UserController(IUserService userService)
@@ -18,6 +20,7 @@ namespace MagicECommerce_API.Controllers
         }
 
         [HttpGet]
+        [RequireRole("Admin")]
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userService.GetAllUsersAsync();
@@ -29,6 +32,7 @@ namespace MagicECommerce_API.Controllers
             });
         }
         [HttpGet("{id}")]
+        [RequireRole("Admin")]
         public async Task<IActionResult> GetUserById(Guid id)
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -40,6 +44,7 @@ namespace MagicECommerce_API.Controllers
             });
         }
         [HttpGet("email/{email}")]
+        [RequireRole("Admin")]
         public async Task<IActionResult> GetUserByEmail(string email)
         {
             var user = await _userService.GetUserByEmailAsync(email);
@@ -52,6 +57,7 @@ namespace MagicECommerce_API.Controllers
         }
 
         [HttpPost]
+        [RequireRole("Admin")]
         public async Task<IActionResult> CreateUser([FromBody] UserCreateRequestDto dto)
         {
             var createdUser = await _userService.CreateUserAsync(dto);
@@ -64,6 +70,7 @@ namespace MagicECommerce_API.Controllers
         }
 
         [HttpGet("role/{roleId}")]
+        [RequireRole("Admin")]
         public async Task<IActionResult> GetUsersByRole(Guid roleId)
         {
             var users = await _userService.GetUsersByRoleAsync(roleId);
@@ -76,6 +83,7 @@ namespace MagicECommerce_API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserUpdateRequestDto dto)
         {
             var updatedUser = await _userService.UpdateUserAsync(id, dto);
@@ -88,6 +96,7 @@ namespace MagicECommerce_API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [RequireRole("Admin")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
             var deleted = await _userService.DeleteUserAsync(id);

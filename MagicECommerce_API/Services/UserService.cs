@@ -6,6 +6,8 @@ using MagicECommerce_API.Exceptions.UserException;
 using MagicECommerce_API.Models;
 using MagicECommerce_API.Repositories.Interfaces;
 using MagicECommerce_API.Services.Interfaces;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace MagicECommerce_API.Services
@@ -268,7 +270,10 @@ namespace MagicECommerce_API.Services
 
         private static string HashPassword(string password)
         {
-            return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(password + "salt"));
+            using var sha256 = SHA256.Create();
+            var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password + "MySuperSecret"));
+            return Convert.ToBase64String(hashedBytes);
+            //return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(password + "salt"));
         }
 
         private static bool IsValidEmail(string email)
