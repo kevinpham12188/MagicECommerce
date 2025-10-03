@@ -17,5 +17,6 @@ namespace MagicECommerce_API.Repositories.Interfaces
         Task<double> GetAverageRatingForProductAsync(Guid productId);
         Task<int> GetReviewCountForProductAsync(Guid productId);
         Task<bool> AnonymizeUserReviewsAsync(Guid userId);
+        Task<Dictionary<int, int>> GetRatingDistributionForProductAsync(Guid productId);
     }
 }

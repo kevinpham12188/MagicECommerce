@@ -66,6 +66,29 @@ namespace MagicECommerce_API.Repositories
             return reviews.Any() ? reviews.Average(r => r.Rating) : 0.0;
         }
 
+        public async Task<Dictionary<int, int>> GetRatingDistributionForProductAsync(Guid productId)
+        {
+            var reviews = await _context.ProductReviews
+                .Where(r => r.ProductId == productId)
+                .GroupBy(r => r.Rating)
+                .Select(g => new {Rating = g.Key, Count = g.Count() })
+                .ToListAsync();
+            var distribution = new Dictionary<int, int>
+            {
+                {5, 0},
+                {4, 0},
+                {3, 0},
+                {2, 0},
+                {1, 0}
+            };
+
+            foreach(var item in reviews)
+            {
+                distribution[item.Rating] = item.Count;
+            }
+            return distribution;
+        }
+
         public async Task<ProductReview?> GetReviewByIdAsync(Guid id)
         {
             return await _context.ProductReviews
