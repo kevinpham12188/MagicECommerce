@@ -12,18 +12,20 @@ namespace MagicECommerce_API.Models
         [Required]
         public Guid ProductId { get; set; }
         [Required]
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
         [Required]
         [Range(1, 5)]
         public int Rating { get; set; }
 
         [MaxLength(1000)]
         public string Comment { get; set; } = string.Empty;
+        public bool IsAnonymous { get; set; } = false;
+        public string DisplayName { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         //Navigation properties
         public Product Product { get; set; }
-        public User User { get; set; }
+        public User? User { get; set; }
     }
 }
