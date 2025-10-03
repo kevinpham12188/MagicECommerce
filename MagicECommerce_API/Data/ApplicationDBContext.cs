@@ -103,7 +103,8 @@ namespace MagicECommerce_API.Data
                 .HasIndex(pr => pr.UserId);
 
             modelBuilder.Entity<ProductReview>()
-                .HasIndex(pr => new { pr.UserId, pr.ProductId });
+                .HasIndex(pr => new { pr.UserId, pr.ProductId })
+                .IsUnique();
         }
     }
 }
