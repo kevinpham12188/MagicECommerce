@@ -14,6 +14,7 @@ namespace MagicECommerce_API.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Address> Addresses { get; set; }
+        public DbSet<ProductReview> ProductReviews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -82,6 +83,27 @@ namespace MagicECommerce_API.Data
                 entity.HasIndex(a => a.UserId);
                 entity.HasIndex(a => new { a.UserId, a.IsDefault });
             });
+
+            modelBuilder.Entity<ProductReview>()
+                .HasOne(pr => pr.User)
+                .WithMany()
+                .HasForeignKey(pr => pr.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<ProductReview>()
+                .HasOne(pr => pr.Product)
+                .WithMany()
+                .HasForeignKey(pr => pr.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ProductReview>()
+                .HasIndex(pr=>pr.ProductId);
+
+            modelBuilder.Entity<ProductReview>()
+                .HasIndex(pr => pr.UserId);
+
+            modelBuilder.Entity<ProductReview>()
+                .HasIndex(pr => new { pr.UserId, pr.ProductId });
         }
     }
 }
