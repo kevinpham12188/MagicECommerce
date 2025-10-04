@@ -5,8 +5,6 @@ using MagicECommerce_API.Exceptions.Base;
 using MagicECommerce_API.Models;
 using MagicECommerce_API.Repositories.Interfaces;
 using MagicECommerce_API.Services.Interfaces;
-using Microsoft.EntityFrameworkCore.Storage.Json;
-using System.Runtime.InteropServices;
 
 
 namespace MagicECommerce_API.Services
