@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MagicECommerce_API.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : BaseRepository<User>, IUserRepository
     {
         private readonly ApplicationDBContext _context;
-        public UserRepository(ApplicationDBContext context)
+        public UserRepository(ApplicationDBContext context) : base(context)
         {
             _context = context;
         }
@@ -91,9 +91,9 @@ namespace MagicECommerce_API.Repositories
             return user;
         }
 
-        public async Task<bool> UserExistsAsync(Guid id)
-        {
-            return await _context.Users.AnyAsync(u => u.Id == id);
-        }
+        //public async Task<bool> UserExistsAsync(Guid id)
+        //{
+        //    return await _context.Users.AnyAsync(u => u.Id == id);
+        //}
     }
 }

@@ -2,7 +2,7 @@
 
 namespace MagicECommerce_API.Repositories.Interfaces
 {
-    public interface IUserRepository
+    public interface IUserRepository : IBaseRepository<User>
     {
         Task<User> CreateAsync(User user);
         Task<User?> GetByIdAsync(Guid id);
@@ -15,6 +15,6 @@ namespace MagicECommerce_API.Repositories.Interfaces
         Task<bool> EmailExistsAsync(string email, Guid excludeUserId);
         Task<IEnumerable<User>> GetAllWithRolesAsync();
         Task<IEnumerable<User>> GetUsersByRoleIdAsync(Guid roleId);
-        Task<bool> UserExistsAsync(Guid id);
+        //Task<bool> UserExistsAsync(Guid id);
     }
 }

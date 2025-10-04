@@ -5,13 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MagicECommerce_API.Repositories
 {
-    public class ProductReviewRepository : IProductReviewRepository
+    public class ProductReviewRepository : BaseRepository<ProductReview>, IProductReviewRepository
     {
-        private readonly ApplicationDBContext _context;
-        public ProductReviewRepository(ApplicationDBContext context)
-        {
-            _context = context;
-        }
+        public ProductReviewRepository(ApplicationDBContext context) : base(context)
+        {}
 
         public async Task<bool> AnonymizeUserReviewsAsync(Guid userId)
         {

@@ -34,9 +34,10 @@ namespace MagicECommerce_API.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<ProductReviewResponseDto>> GetAllReviewsAsync()
+        public async Task<IEnumerable<ProductReviewResponseDto>> GetAllReviewsAsync()
         {
-            throw new NotImplementedException();
+            var reviews = await _reviewRepo.GetAllReviewsAsync();
+            return reviews.Select(MapToResponseDto).ToList();
         }
 
         public Task<ProductRatingStatsDto> GetProductRatinStatsAsync(Guid productId)

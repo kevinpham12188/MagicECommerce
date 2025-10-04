@@ -2,7 +2,7 @@
 
 namespace MagicECommerce_API.Repositories.Interfaces
 {
-    public interface IProductRepository
+    public interface IProductRepository : IBaseRepository<Product>
     {
         Task<IEnumerable<Product>> GetAllAsync();
         Task<Product?> GetByIdAsync(Guid id);

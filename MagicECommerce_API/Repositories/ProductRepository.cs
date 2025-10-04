@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MagicECommerce_API.Repositories
 {
-    public class ProductRepository : IProductRepository
+    public class ProductRepository : BaseRepository<Product>, IProductRepository
     {
         private readonly ApplicationDBContext _context;
-        public ProductRepository(ApplicationDBContext context)
+        public ProductRepository(ApplicationDBContext context) : base(context)
         {
             _context = context;
         }
